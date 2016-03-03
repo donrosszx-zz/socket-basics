@@ -5,10 +5,11 @@ socket.on('connect', function () {
 });
 
 socket.on('message', function (message) {
+    var momentTimestamp = moment.utc(message.timestamp);
     console.log('New message:');
     console.log(message.text);
 
-    jQuery('.messages').append('<p><strong>' + message.timestamp + '</strong>: ' + message.text +'</p>');
+    jQuery('.messages').append('<p><strong>' + momentTimestamp.local().format('h:mm a') + '</strong>: ' + message.text +'</p>');
 });
 
 // Handles submitting of new message
@@ -17,13 +18,10 @@ var $form = jQuery('#message-form');
 $form.on('submit', function (event) {
     event.preventDefault();
 
-    var $messageText = $form.find('input[name=message]').val();
-    var now = moment();
-    var timestampMoment = moment.utc(now.valueOf());
+    var $message = $form.find('input[name=message]').val();
 
     socket.emit('message', {
-        text: $messageText,
-        timestamp: timestampMoment.local().format('h:mm a')
+        text: $message
     });
 
     $form[0].reset();
